@@ -1,6 +1,6 @@
 function! neovimux#RunCommand(cmd) abort
   if !exists("g:neovimux_terminal_buffer")
-    call s:create_terminal_split(g:neovimux_split_vertical)
+    call s:create_terminal_buffer()
   endif
 
   let prev_window = winnr()
@@ -10,19 +10,19 @@ function! neovimux#RunCommand(cmd) abort
   wincmd p
 endfunction
 
-function! s:create_terminal_split(vertical) abort
-  let termbuff = "term://" . &shell
+function! s:create_terminal_buffer() abort
+  let termbuff = "term://" . g:neovimux_shell
 
-  if a:vertical
-    execute "vsplit " . termbuff
+  if g:neovimux_split_vertical
+    execute g:neovimux_split_size . "vsplit " . termbuff
   else
-    execute "split " . termbuff
+    execute g:neovimux_split_size . "split " . termbuff
   endif
 
-  call s:register_terminal_buffer()
+  call s:initialize_terminal_buffer()
 endfunction
 
-function! s:register_terminal_buffer() abort
+function! s:initialize_terminal_buffer() abort
   let g:neovimux_terminal_buffer = bufnr("%")
 
   setlocal nohidden
