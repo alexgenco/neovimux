@@ -16,4 +16,7 @@ if !exists("g:neovimux_shell")
   let g:neovimux_shell = &shell
 endif
 
-command! -nargs=1 NeovimuxRunCommand :call neovimux#RunCommand(<args>)
+command! -nargs=1 NeovimuxRunCommand    :call neovimux#RunCommand(<args>)
+command! -nargs=0 NeovimuxOpenTerminal  :call neovimux#OpenTerminal()
+command! -nargs=0 NeovimuxFocusTerminal :call neovimux#FocusTerminal()
+command! -nargs=0 NeovimuxCloseTerminal :call neovimux#CloseTerminal()
