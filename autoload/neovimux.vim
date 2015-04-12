@@ -52,7 +52,5 @@ function! s:initialize_terminal_buffer() abort
   let g:neovimux_terminal_buffer = bufnr("%")
 
   setlocal nohidden
-
-  autocmd! * <buffer>
   autocmd! BufDelete <buffer> :unlet g:neovimux_terminal_buffer
 endfunction
