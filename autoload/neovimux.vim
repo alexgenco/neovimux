@@ -1,16 +1,35 @@
-function! neovimux#RunCommand(cmd) abort
-  if !exists("g:neovimux_terminal_buffer")
-    call neovimux#OpenTerminal()
+function! neovimux#Run(cmd) abort
+  let source_window = winnr()
+
+  if exists("g:neovimux_terminal_window")
+    call s:move_to_terminal()
+  else
+    call s:open_terminal(1)
   endif
 
-  let prev_window = winnr()
-
-  call neovimux#FocusTerminal()
   execute "normal! i" . a:cmd . ""
-  wincmd p
+  execute source_window . "wincmd w"
 endfunction
 
-function! neovimux#OpenTerminal() abort
+function! neovimux#Focus(insert_mode) abort
+  if exists("g:neovimux_terminal_window")
+    call s:move_to_terminal()
+  else
+    call s:open_terminal(1)
+  endif
+
+  if a:insert_mode
+    startinsert
+  endif
+endfunction
+
+function! neovimux#Close() abort
+  if exists("g:neovimux_terminal_buffer")
+    execute "bdelete! " . g:neovimux_terminal_buffer
+  endif
+endfunction
+
+function! s:open_terminal(move_focus) abort
   let termbuff = "term://" . g:neovimux_shell
 
   if g:neovimux_split_vertical
@@ -19,38 +38,17 @@ function! neovimux#OpenTerminal() abort
     execute "botright " . g:neovimux_split_size . "split " . termbuff
   endif
 
-  call s:initialize_terminal_buffer()
-  wincmd p
-endfunction
-
-function! neovimux#FocusTerminal() abort
-  if s:has_open_terminal()
-    let term_window = bufwinnr(g:neovimux_terminal_buffer)
-    execute term_window . "wincmd w"
-  endif
-endfunction
-
-function! neovimux#CloseTerminal() abort
-  if s:has_open_terminal()
-    execute "bdelete! " . g:neovimux_terminal_buffer
-  endif
-endfunction
-
-function! s:has_open_terminal() abort
-  if !exists("g:neovimux_terminal_buffer")
-    return 0
-  end
-
-  if bufwinnr(g:neovimux_terminal_buffer) == -1
-    return 0
-  endif
-
-  return 1
-endfunction
-
-function! s:initialize_terminal_buffer() abort
   let g:neovimux_terminal_buffer = bufnr("%")
+  let g:neovimux_terminal_window = winnr()
 
   setlocal nohidden
-  autocmd! BufDelete <buffer> :unlet g:neovimux_terminal_buffer
+  autocmd BufDelete <buffer> :unlet g:neovimux_terminal_buffer g:neovimux_terminal_window
+
+  if !a:move_focus
+    wincmd p
+  endif
+endfunction
+
+function! s:move_to_terminal() abort
+  execute g:neovimux_terminal_window . "wincmd w"
 endfunction
