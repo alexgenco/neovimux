@@ -1,5 +1,6 @@
 function! neovimux#Run(cmd) abort
   let source_window = winnr()
+  let g:neovimux_last_command = a:cmd
 
   if exists("g:neovimux_terminal_window")
     call s:move_to_terminal()
@@ -27,6 +28,14 @@ function! neovimux#Close() abort
   if exists("g:neovimux_terminal_buffer")
     execute "bdelete! " . g:neovimux_terminal_buffer
   endif
+endfunction
+
+function! neovimux#RunLast() abort
+  if exists("g:neovimux_last_command")
+    call neovimux#Run(g:neovimux_last_command)
+  else
+    echomsg "No last Neovimux command."
+  end
 endfunction
 
 function! s:open_terminal(move_focus) abort
